@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Financiero – RNF-01</title>
+    <style>
+        body{
+            font-family: Arial;
+            background:#f4f4f4;
+            padding:30px;
+        }
+        .container{
+            background:white;
+            width:450px;
+            padding:20px;
+            margin:auto;
+            border-radius:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,.2);
+        }
+        label{font-weight:bold;}
+        input, select{
+            width:100%;
+            padding:8px;
+            margin-bottom:12px;
+        }
+        button{
+            padding:10px 18px;
+            border:none;
+            background:#2d6cdf;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+        .error{
+            background:#f8d7da;
+            padding:10px;
+            border-left:5px solid #a30000;
+            margin-bottom:12px;
+        }
+        .success{
+            background:#d4edda;
+            padding:10px;
+            border-left:5px solid #0f6b27;
+            margin-bottom:12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Registro Financiero</h2>
+
+    <div id="msg"></div>
+
+    <label>Categoría</label>
+    <select id="categoria">
+        <option value="">Seleccione...</option>
+        <option value="Ingreso">Ingreso</option>
+        <option value="Gasto">Gasto</option>
+        <option value="Recuperación">Recuperación</option>
+    </select>
+
+    <label>Descripción</label>
+    <input type="text" id="descripcion" placeholder="Descripción del registro">
+
+    <label>Monto</label>
+    <input type="number" id="monto" step="0.01" placeholder="0.00">
+
+    <label>Fecha</label>
+    <input type="date" id="fecha">
+
+    <button onclick="guardarRegistro()">Guardar Registro</button>
+</div>
+
+<script>
+    function mostrarMensaje(texto, tipo){
+        const msg = document.getElementById("msg");
+        msg.innerHTML = `<div class="${tipo}">${texto}</div>`;
+    }
+
+    function validarDatos(categoria, descripcion, monto, fecha){
+        if(!categoria || !descripcion || !monto || !fecha){
+            mostrarMensaje("Todos los campos son obligatorios.", "error");
+            return false;
+        }
+
+        if(monto <= 0){
+            mostrarMensaje("El monto debe ser un número válido mayor a 0.", "error");
+            return false;
+        }
+
+        const fechaIngresada = new Date(fecha);
+        if(isNaN(fechaIngresada)){
+            mostrarMensaje("La fecha no es válida.", "error");
+            return false;
+        }
+
+        return true;
+    }
+
+    function guardarRegistro(){
+        const categoria = document.getElementById("categoria").value;
+        const descripcion = document.getElementById("descripcion").value.trim();
+        const monto = parseFloat(document.getElementById("monto").value);
+        const fecha = document.getElementById("fecha").value;
+
+        if(!validarDatos(categoria, descripcion, monto, fecha)){
+            return; // flujo alternativo
+        }
+
+        const registro = {
+            id: Date.now(),
+            categoria: categoria,
+            descripcion: descripcion,
+            monto: monto,
+            fecha: fecha
+        };
+
+        let registros = JSON.parse(localStorage.getItem("registrosFinancieros")) || [];
+        registros.push(registro);
+
+        localStorage.setItem("registrosFinancieros", JSON.stringify(registros));
+
+        mostrarMensaje("Registro guardado correctamente.", "success");
+
+        document.getElementById("categoria").value = "";
+        document.getElementById("descripcion").value = "";
+        document.getElementById("monto").value = "";
+        document.getElementById("fecha").value = "";
+    }
+</script>
+
+</body>
+</html>
