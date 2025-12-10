@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Log-Up — Login</title>
+
+<!-- Estilos simples y limpios -->
+<style>
+    :root{
+    --accent:#2b8cbe;
+    --muted:#6b7280;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --radius:10px;
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    html,body{height:100%; margin:0; background:var(--bg); color:#111827;}
+    .wrap{
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    }
+
+    .card{
+    width:100%;
+    max-width:920px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:20px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 6px 20px rgba(15,23,42,0.08);
+    overflow:hidden;
+    }
+
+    /* Panel izquierdo: header / descripción */
+    .panel-left{
+    padding:36px;
+    background:linear-gradient(180deg, rgba(43,140,190,0.06), transparent 40%);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    justify-content:center;
+    }
+    h1{margin:0; font-size:28px; color:var(--accent);}
+    p.lead{margin:0; color:var(--muted); line-height:1.45;}
+
+    /* Panel derecho: formularios */
+    .panel-right{padding:28px; display:flex; align-items:center; justify-content:center;}
+    form{width:100%; max-width:360px;}
+    .form-group{display:flex; flex-direction:column; margin-bottom:12px;}
+    label{font-size:13px; color:#374151; margin-bottom:6px;}
+    input[type="text"], input[type="email"], input[type="password"]{
+    padding:10px 12px;
+    border:1px solid #e6e9ee;
+    border-radius:8px;
+    font-size:14px;
+    outline:none;
+    }
+    input:focus{box-shadow:0 0 0 4px rgba(43,140,190,0.08); border-color:var(--accent);}
+
+    .actions{display:flex; gap:10px; align-items:center; margin-top:8px;}
+    button.primary{
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    }
+    button.ghost{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid rgba(43,140,190,0.14);
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    }
+
+    .small{font-size:13px; color:var(--muted);}
+    .link{color:var(--accent); cursor:pointer; text-decoration:underline; background:none; border:0; padding:0;}
+
+    /* Simple responsive */
+    @media (max-width:800px){
+    .card{grid-template-columns:1fr; padding:16px;}
+    .panel-left{order:2; padding:18px;}
+    .panel-right{order:1; padding:18px;}
+    }
+
+    /* Mensajes de error */
+    .error{color:#b91c1c; font-size:13px; margin-top:6px;}
+    .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card" role="region" aria-label="Log-Up Authentication">
+    <!-- Izquierda: título y descripción -->
+    <div class="panel-left">
+        <h1>Log-Up</h1>
+        <p class="lead">
+        Bienvenido a <strong>Log-Up</strong>, tu sistema simple para registrar y analizar
+        datos financieros: ingresos, gastos e indicadores básicos. Inicia sesión para acceder
+        a tu panel o crea una cuenta nueva si aún no tienes una.
+        </p>
+
+        <hr style="border:none;border-top:1px solid #eef2f7;margin:18px 0" />
+
+        <div style="font-size:14px;color:var(--muted);line-height:1.6">
+        <strong>Consejo:</strong>
+        Para probar la app localmente puedes crear una cuenta rápida y luego cargar tu CSV
+        desde el panel principal.
+        </div>
+    </div>
+
+    <!-- Derecha: formularios (login / crear cuenta) -->
+    <div class="panel-right">
+        <!-- LOGIN -->
+        <form id="loginForm" aria-label="Formulario de inicio de sesión" novalidate>
+        <h2 style="margin-top:0;margin-bottom:8px">Iniciar sesión</h2>
+
+        <div class="form-group">
+            <label for="loginEmail">Correo electrónico</label>
+            <input id="loginEmail" type="email" placeholder="ejemplo@correo.com" required />
+        </div>
+
+        <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <input id="loginPassword" type="password" placeholder="Tu contraseña" required />
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);">
+            <input id="rememberMe" type="checkbox" /> Recordarme
+            </label>
+
+            <button type="button" class="link" id="showSignupBtn" aria-controls="signupForm">Crear cuenta</button>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="primary">Entrar</button>
+            <button type="button" class="ghost" id="demoBtn">Entrar como demo</button>
+        </div>
+
+        <div id="loginError" class="error hidden" role="alert"></div>
+        </form>
+
+        <!-- SIGNUP (oculto inicialmente) -->
+        <form id="signupForm" class="hidden" aria-label="Formulario de creación de cuenta" novalidate>
+        <h2 style="margin-top:0;margin-bottom:8px">Crear cuenta</h2>
+
+        <div class="form-group">
+            <label for="signupName">Nombre completo</label>
+            <input id="signupName" type="text" placeholder="Tu nombre" required />
+        </div>
+
+        <div class="form-group">
+            <label for="signupEmail">Correo electrónico</label>
+            <input id="signupEmail" type="email" placeholder="ejemplo@correo.com" required />
+        </div>
+
+        <div class="form-group">
+            <label for="signupPassword">Contraseña</label>
+            <input id="signupPassword" type="password" placeholder="Crea una contraseña" required />
+        </div>
+
+        <div class="form-group">
+            <label for="signupPasswordConfirm">Confirmar contraseña</label>
+            <input id="signupPasswordConfirm" type="password" placeholder="Repite la contraseña" required />
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-start;">
+            <button type="submit" class="primary">Crear cuenta</button>
+            <button type="button" class="ghost" id="showLoginBtn">Volver al login</button>
+        </div>
+
+        <div id="signupError" class="error hidden" role="alert"></div>
+        <div id="signupSuccess" class="hidden" style="color:green;margin-top:8px;font-size:13px;">Cuenta creada (simulado).</div>
+        </form>
+    </div>
+    </div>
+</div>
+
+<!-- Script que alterna formularios y hace validación simple -->
+<script>
+    // Elementos
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const showSignupBtn = document.getElementById('showSignupBtn');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+    const demoBtn = document.getElementById('demoBtn');
+
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
+    const signupSuccess = document.getElementById('signupSuccess');
+
+    // Funciones utilitarias
+    function show(el){ el.classList.remove('hidden'); }
+    function hide(el){ el.classList.add('hidden'); }
+
+    // Alternar a crear cuenta
+    showSignupBtn.addEventListener('click', () => {
+    hide(loginForm);
+    show(signupForm);
+    hide(loginError);
+    hide(signupError);
+    hide(signupSuccess);
+    });
+
+    // Volver a login
+    showLoginBtn.addEventListener('click', () => {
+    hide(signupForm);
+    show(loginForm);
+    hide(signupError);
+    hide(signupSuccess);
+    hide(loginError);
+    });
+
+    // Demo: rellena campos de login con datos de prueba
+    demoBtn.addEventListener('click', () => {
+    document.getElementById('loginEmail').value = 'demo@logup.local';
+    document.getElementById('loginPassword').value = 'demopass';
+      // Simula submit
+    loginForm.dispatchEvent(new Event('submit', { bubbles: true }));
+    });
+
+    // Validación/submit del login (simulado)
+    loginForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    hide(loginError);
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !pass) {
+        loginError.textContent = 'Por favor completa correo y contraseña.';
+        show(loginError);
+        return;
+    }
+
+      // Validación simple de formato de correo
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!emailOk) {
+        loginError.textContent = 'Correo inválido.';
+        show(loginError);
+        return;
+    }
+
+      // Aquí normalmente enviarías los datos al servidor (fetch / ajax).
+      // Para mantener esto didáctico y sin backend, mostramos un mensaje simulado.
+    alert('Inicio de sesión simulado correcto.\n(En un proyecto real aquí se validaría con el servidor.)');
+      // TODO: redirigir al panel principal, e.g. window.location.href = 'dashboard.html';
+    });
+
+    // Submit de crear cuenta (simulado)
+    signupForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    hide(signupError);
+    hide(signupSuccess);
+
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const pass = document.getElementById('signupPassword').value;
+    const pass2 = document.getElementById('signupPasswordConfirm').value;
+
+    if (!name || !email || !pass || !pass2) {
+        signupError.textContent = 'Por favor completa todos los campos.';
+        show(signupError);
+        return;
+    }
+
+    if (pass !== pass2) {
+        signupError.textContent = 'Las contraseñas no coinciden.';
+        show(signupError);
+        return;
+    }
+
+    if (pass.length < 6) {
+        signupError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        show(signupError);
+        return;
+    }
+
+      // Simular creación de cuenta (en un proyecto real haríamos fetch a la API)
+    signupSuccess.textContent = 'Cuenta creada correctamente (simulado). Ahora puedes iniciar sesión.';
+    how(signupSuccess);
+
+      // Limpiar y volver al login después de 1.2s
+    setTimeout(() => {
+        hide(signupForm);
+        show(loginForm);
+        signupForm.reset();
+        signupSuccess.textContent = '';
+    }, 1200);
+    });
+</script>
+</body>
+</html>
